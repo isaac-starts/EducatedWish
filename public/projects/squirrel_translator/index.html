@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Squirrel Translator Engine v0.1</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #111;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 3rem;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            max-width: 600px;
+        }
+
+        h1 {
+            color: #4ade80;
+            margin-bottom: 0.5rem;
+        }
+
+        p {
+            color: #94a3b8;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+        }
+
+        .upload-area {
+            border: 2px dashed rgba(74, 222, 128, 0.5);
+            padding: 3rem 2rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .upload-area:hover {
+            border-color: #4ade80;
+            background: rgba(74, 222, 128, 0.1);
+        }
+
+        .upload-area i {
+            font-size: 3rem;
+            color: #4ade80;
+            margin-bottom: 1rem;
+        }
+
+        .btn {
+            margin-top: 2rem;
+            background: #4ade80;
+            color: #111;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 30px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+        }
+
+        .waveform {
+            display: none;
+            margin-top: 2rem;
+            height: 60px;
+            background: repeating-linear-gradient(90deg,
+                    rgba(74, 222, 128, 0.1),
+                    rgba(74, 222, 128, 0.1) 2px,
+                    rgba(74, 222, 128, 0.5) 2px,
+                    rgba(74, 222, 128, 0.5) 4px);
+            border-radius: 4px;
+            animation: moveWave 2s linear infinite;
+        }
+
+        @keyframes moveWave {
+            0% {
+                background-position: 0 0;
+            }
+
+            100% {
+                background-position: 40px 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Squirrel Translator Engine</h1>
+        <p>A functional alpha utilizing semantic audio analysis to map rodent vocalizations to human language models.
+            Help us fund compute or contribute training data below.</p>
+
+        <div class="upload-area" id="uploadArea">
+            <i class="fa-solid fa-microphone-lines"></i>
+            <h3>Drop Squirrel Audio Here</h3>
+            <p style="margin-bottom:0;">.mp3, .wav, .m4a accepted</p>
+        </div>
+
+        <div class="waveform" id="waveform"></div>
+
+        <div id="output" style="display:none; margin-top: 2rem; color: #facc15; font-size: 1.2rem; font-style: italic;">
+            "Analyzing vocalizations..."
+        </div>
+
+        <button class="btn">Donate to Compute Fund <i class="fa-solid fa-bolt"></i></button>
+    </div>
+
+    <script>
+        const area = document.getElementById('uploadArea');
+        const wave = document.getElementById('waveform');
+        const output = document.getElementById('output');
+
+        area.addEventListener('click', () => {
+            area.style.display = 'none';
+            wave.style.display = 'block';
+            output.style.display = 'block';
+
+            setTimeout(() => {
+                output.style.color = '#fff';
+                output.innerHTML = '<strong>Translation:</strong> "Did you bury the acorn near the large oak, or the slightly smaller oak?"';
+            }, 3000);
+        });
+    </script>
+</body>
+
+</html>

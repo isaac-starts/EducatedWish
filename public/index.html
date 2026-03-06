@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Educated Wish | A Community of Hope</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Outfit:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <link rel="stylesheet" href="/assets/css/styles.css">
+</head>
+
+<body>
+    <div class="mesh-bg"></div>
+
+    <nav class="glass-nav">
+        <div class="nav-content">
+            <div class="nav-brand" id="brandDisplay">
+                <!-- Option 1: The Clarifying Wind -->
+                <div class="logo-variant active" id="logo-1" title="The Clarifying Wind">
+                    <div class="owl-airy owl-wind">🦉</div>
+                    <div class="brand-text ethereal-text wind">
+                        <span>E</span><span>d</span><span>u</span><span>c</span><span>a</span><span>t</span><span>e</span><span>d</span>
+                        &nbsp;
+                        <span>W</span><span>i</span><span>s</span><span>h</span>
+                    </div>
+                </div>
+
+                <!-- Option 2: The Ethereal Pulse -->
+                <div class="logo-variant" id="logo-2" title="The Ethereal Pulse">
+                    <div class="owl-airy owl-pulse">🦉</div>
+                    <div class="brand-text ethereal-text pulse">
+                        <span>E</span><span>d</span><span>u</span><span>c</span><span>a</span><span>t</span><span>e</span><span>d</span>
+                        &nbsp;
+                        <span>W</span><span>i</span><span>s</span><span>h</span>
+                    </div>
+                </div>
+
+                <!-- Option 3: The Ghostly Snap -->
+                <div class="logo-variant" id="logo-3" title="The Ghostly Snap">
+                    <div class="owl-airy owl-ghost">🦉</div>
+                    <div class="brand-text ethereal-text ghost">
+                        <span>E</span><span>d</span><span>u</span><span>c</span><span>a</span><span>t</span><span>e</span><span>d</span>
+                        &nbsp;
+                        <span>W</span><span>i</span><span>s</span><span>h</span>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-links">
+                <button class="nav-btn active" data-target="homeView">Home</button>
+                <button class="nav-btn" data-target="topPostsView">Top Wishes</button>
+                <button class="nav-btn" data-target="quotesView">Inspiration</button>
+            </div>
+            <div class="user-controls">
+                <div class="user-info-group">
+                    <div class="user-badge" id="userBadge" title="Set Username">
+                        <div id="userAvatar" class="avatar-animal">🦝</div>
+                        <span id="usernameDisplay">Anonymous</span>
+                    </div>
+                    <div class="user-rank" id="userRankDisplay" title="Audacity Points">
+                        ✨ Optimist (0 AP)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="app-container" id="mainContainer">
+
+        <!-- Home View -->
+        <div id="homeView" class="view-section active">
+            <div class="hero">
+                <div class="hero-left">
+                    <h1 class="hero-title">Make a promise to the universe.</h1>
+                    <p class="hero-subtitle">Or, you know... an <em>"educated wish"</em>. A well-intentioned fib, a
+                        confident gamble, a minor stretch of the truth made for all the right reasons. Pin it down and
+                        let's see what happens.</p>
+
+                    <div class="wish-form glass-panel">
+                        <input type="text" id="wishTitle" class="glass-input" placeholder="Give your wish a title...">
+                        <textarea id="wishContent" class="glass-input textarea"
+                            placeholder="Describe your educated wish (we promise not to fact-check)..."></textarea>
+
+                        <div class="form-actions">
+                            <div class="color-picker" id="colorPicker">
+                                <div class="color-swatch active" data-color="#FFF9C4" style="background: #FFF9C4;">
+                                </div>
+                                <div class="color-swatch" data-color="#C8E6C9" style="background: #C8E6C9;"></div>
+                                <div class="color-swatch" data-color="#FFCDD2" style="background: #FFCDD2;"></div>
+                                <div class="color-swatch" data-color="#E1BEE7" style="background: #E1BEE7;"></div>
+                                <div class="color-swatch" data-color="#BBDEFB" style="background: #BBDEFB;"></div>
+                                <div class="color-swatch" data-color="#FFECB3" style="background: #FFECB3;"></div>
+                            </div>
+
+                            <div class="file-action">
+                                <input type="file" id="wishFile" accept="image/*" class="hidden-input">
+                                <button class="btn icon-btn" id="triggerFileBtn" title="Attach an image">
+                                    <i class="fa-solid fa-image"></i>
+                                </button>
+                                <span id="fileNameDisplay" class="file-name"></span>
+                            </div>
+
+                            <button id="postWishBtn" class="btn primary-btn">
+                                <span>Pin Wish</span>
+                                <i class="fa-solid fa-thumbtack"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="hero-right">
+                    <div class="corkboard-preview preview-illustration">
+                        <div class="floating-note note-1" style="background: #FFF9C4;">
+                            <div class="pin"></div>
+                            <h3>My Diet</h3>
+                            <p>I will totally stop eating tacos by next week. Definitely.</p>
+                        </div>
+                        <div class="floating-note note-2" style="background: #FFCDD2;">
+                            <div class="pin"></div>
+                            <h3>Five Minutes</h3>
+                            <p>Honey, I'm just running into the craft store for five minutes. I promise.</p>
+                        </div>
+                        <div class="floating-note note-3" style="background: #C8E6C9;">
+                            <div class="pin tape"></div>
+                            <h3>Quick Fix</h3>
+                            <p>I know exactly what's wrong with the code and I can fix it in a minute.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="board-controls">
+                <h2>The Wish Board</h2>
+                <div class="filters">
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="searchInput" placeholder="Search wishes...">
+                    </div>
+                    <select id="sortSelect" class="glass-select">
+                        <option value="newest">Sort by: Most Recent Event</option>
+                        <option value="oldest">Sort by: Oldest Prophecy</option>
+                        <option value="mostLiked">Sort by: Most Plausible</option>
+                        <option value="mostCommented">Sort by: Most Debated</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="postsContainer" class="board-grid">
+                <!-- Posts will be generated here -->
+            </div>
+        </div>
+
+        <!-- Top Posts View -->
+        <div id="topPostsView" class="view-section hidden">
+            <div class="page-header">
+                <h2>The Multiverse Board</h2>
+                <p>The most legendary, audacious, and highly plausible wishes on our timeline.</p>
+            </div>
+            <div id="topPostsContainer" class="board-grid"></div>
+        </div>
+
+        <!-- Quotes & Strategies -->
+        <div id="quotesView" class="view-section hidden">
+            <div class="page-header">
+                <h2>Inspiration & Strategies</h2>
+                <p>Curated thoughts to guide your "educated wishes" into reality.</p>
+            </div>
+            <div class="inspiration-grid">
+                <div class="inspire-card glass-panel">
+                    <div class="card-icon"><i class="fa-solid fa-mask"></i></div>
+                    <h3>The Confident Gamble</h3>
+                    <p>"I'm not lying, I'm just predicting a very specific future that needs my help to exist."</p>
+                    <div class="strategy">Strategy: Speak your victory into existence, even if you have no idea how
+                        you'll get there.</div>
+                </div>
+                <div class="inspire-card glass-panel">
+                    <div class="card-icon"><i class="fa-solid fa-hand-holding-heart"></i></div>
+                    <h3>Good Intentions</h3>
+                    <p>"A small stretch of the truth made for the right reasons is simply an act of aggressive
+                        optimism."</p>
+                    <div class="strategy">Strategy: Make sure your mischievous wishes ultimately serve to help someone
+                        else.</div>
+                </div>
+                <div class="inspire-card glass-panel">
+                    <div class="card-icon"><i class="fa-solid fa-face-laugh-wink"></i></div>
+                    <h3>Plausible Deniability</h3>
+                    <p>"It wasn't a lie, it was just an alternative timeline that I accidentally verbalized."</p>
+                    <div class="strategy">Strategy: Always have a backup plan for when the universe calls your bluff.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modals -->
+    <div id="usernameModal" class="modal-overlay">
+        <div class="modal-container glass-panel">
+            <button class="close-modal"><i class="fa-solid fa-xmark"></i></button>
+            <h3>Who is wishing?</h3>
+            <p>Choose a name to sign your dreams.</p>
+            <input type="text" id="usernameInput" class="glass-input" placeholder="Enter a beautiful name...">
+            <div class="modal-actions">
+                <button id="clearUsernameBtn" class="btn text-btn">Stay Anonymous</button>
+                <button id="saveUsernameBtn" class="btn primary-btn">Embrace Name</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="commentModal" class="modal-overlay">
+        <div class="modal-container glass-panel large-modal">
+            <button class="close-modal"><i class="fa-solid fa-xmark"></i></button>
+            <div class="modal-split">
+                <div class="modal-wish-context" id="modalWishContext">
+                    <!-- Cloned wish goes here -->
+                </div>
+                <div class="modal-comments-area">
+                    <h3>Responses from the universe</h3>
+                    <div id="commentsList" class="comments-list">
+                        <!-- Comments here -->
+                    </div>
+                    <div class="comment-input-area">
+                        <textarea id="newCommentInput" class="glass-input"
+                            placeholder="Write an encouraging thought..."></textarea>
+                        <button id="addCommentBtn" class="btn primary-btn"><i
+                                class="fa-solid fa-paper-plane"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Fulfillment Modal -->
+    <div id="fulfillmentModal" class="modal-overlay">
+        <div class="modal-container glass-panel large-modal fulfillment-container">
+            <button class="close-modal"><i class="fa-solid fa-xmark"></i></button>
+            <div class="fulfillment-header">
+                <h3><i class="fa-solid fa-wand-magic-sparkles"></i> The Universe Refuses to Ignore You</h3>
+                <p id="fulfillmentTitle" class="fulfillment-title"></p>
+                <p id="fulfillmentDesc" class="fulfillment-desc"></p>
+            </div>
+            <div id="fulfillmentContent" class="fulfillment-content">
+                <!-- Media injected here -->
+            </div>
+            <div class="modal-actions" style="justify-content: center; margin-top: 1rem;">
+                <button id="fulfillmentActionBtn" class="btn primary-btn" style="display: none;"></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="logo-toggles" id="logoToggles">
+        <button class="logo-toggle-btn active" data-target="1" title="Clarifying Wind (Option 1)">1</button>
+        <button class="logo-toggle-btn" data-target="2" title="Ethereal Pulse (Option 2)">2</button>
+        <button class="logo-toggle-btn" data-target="3" title="Ghostly Snap (Option 3)">3</button>
+    </div>
+
+    <script type="module" src="/assets/js/index.js"></script>
+</body>
+
+</html>
