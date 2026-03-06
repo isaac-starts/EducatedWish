@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "main": "src/server.js",
   "dependencies": {
+    "dotenv": "^17.3.1",
     "express": "^4.17.1",
-    "multer": "^1.4.2"
+    "multer": "^1.4.2",
+    "openai": "^6.27.0"
   },
   "scripts": {
     "start": "node src/server.js"

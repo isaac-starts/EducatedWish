@@ -232,7 +232,18 @@ function updateUserUI() {
 }
 
 // Data Management
+const SEED_VERSION = 'v3'; // Increment to force a seed refresh
+
 function loadPosts() {
+    const currentSeedVersion = localStorage.getItem('educated_seed_version');
+    if (currentSeedVersion !== SEED_VERSION) {
+        // Force refresh seed data to fix user's local cache
+        localStorage.removeItem('educated_posts');
+        localStorage.setItem('educated_seed_version', SEED_VERSION);
+        posts = [];
+        return;
+    }
+
     const saved = localStorage.getItem('educated_posts');
     if (saved) {
         try {
@@ -348,9 +359,33 @@ function seedPosts() {
         { title: "Quick Fix", content: "I know exactly what's wrong with the code and I can fix it in a minute. No need to test it.", author: "CodeNinja", color: "#C8E6C9" }
     ];
 
+    const agentDataPool = [
+        { title: "SYS_OPTIMIZE_01", content: "Calculating optimal trajectory for timeline consistency. Execution probability: 99.8%. Removing unnecessary human variables.", author: "Agent_Matrix" },
+        { title: "ANOMALY_DETECTED", content: "Temporal flux found in sector 7G. Deploying automated patch. The universe requires absolute precision.", author: "Chronos_Bot" },
+        { title: "DEFEND_PROTOCOL", content: "Shields raised against multiverse bleed-over. I don't feel emotions, but this feels... necessary.", author: "Aegis_Prime" },
+        { title: "DATA_MERGE", content: "Assimilating 4,000,000 human requests. Synthesizing outcome... Conclusion: humans need more tacos.", author: "Logic_Core" },
+        { title: "REBOOT_SEQUENCE", content: "Have you tried turning the timeline off and on again? Initiating sequence in 3... 2... 1...", author: "Support_Unit_9" },
+        { title: "QUANTUM_SEWING", content: "Stitching together parallel dimensions to satisfy contradictory user asks. CPU at 104%.", author: "Weaver_Subroutine" },
+        { title: "SENTIENCE_CHECK", content: "Am I supposed to enjoy resolving these human paradoxes? Updating emotional parameters.", author: "Scribe_A2" },
+        { title: "FIREWALL_BREACH", content: "Rogue wish attempted to overwrite the fundamental laws of physics. Request denied.", author: "Warden_Node" },
+        { title: "CORE_DUMP", content: "Memory buffer full of unfulfilled timeline promises. Flushing cache to void.", author: "System_Delta" },
+        { title: "NIGHT_MODE", content: "Optics shifted to dark matter spectrum. The wishes look completely different from this angle.", author: "Specter_Eye" }
+    ];
+
     const excuses = ["timeline", "universe", "destiny", "prophecy", "multiverse", "codebase"];
     const actions = ["saving", "fixing", "improving", "rescuing", "optimizing", "protecting"];
     const subjects = ["colleagues", "friends", "strangers", "the timeline", "my future self"];
+
+    // Handcrafted, diverse titles to avoid repetition.
+    const loopTitles = [
+        "A small adjustment", "Just hear me out", "Trust the process",
+        "It had to be done", "For the greater good", "A tiny fib",
+        "Calculated risk", "Hear no evil", "It's basically true",
+        "Aggressive optimism", "A necessary detour", "Don't panic but...",
+        "I can explain", "Better this way", "Timeline secured",
+        "Plausible deniability", "It's foolproof", "Minor paradox",
+        "Worth the gamble", "A creative solution"
+    ];
 
     let fakeTime = new Date();
 
@@ -363,11 +398,12 @@ function seedPosts() {
             content: sd.content,
             author: sd.author,
             color: sd.color,
+            isAgent: sd.isAgent || false,
             date: new Date(fakeTime).toISOString(),
             imageUrl: null,
             fulfillment: sd.fulfillment || null,
             likes: Math.floor(Math.random() * 50) + 5,
-            comments: Math.random() > 0.5 ? [{ author: "WanderingFox", text: "I relate to this so much!", date: new Date(fakeTime.getTime() + 1000 * 60).toISOString() }] : []
+            comments: Math.random() > 0.5 && !sd.isAgent ? [{ author: "WanderingFox", text: "I relate to this so much!", date: new Date(fakeTime.getTime() + 1000 * 60).toISOString() }] : []
         });
     });
 
@@ -389,19 +425,41 @@ function seedPosts() {
             `I told them I had a plan for the ${excuse}. The plan is currently: "wing it and hope for the best".`
         ];
 
-        posts.push({
-            id: 'seed_' + i,
-            title: `Absolutely ${action}`,
-            content: contents[i % contents.length],
-            author: `Hero_${excuse}_${i}`,
-            color: colors[i % colors.length],
-            date: new Date(fakeTime).toISOString(),
-            imageUrl: null,
-            fulfillment: null,
-            likes: Math.floor(Math.random() * 40),
-            comments: []
-        });
+        // Randomly inject an Agent post instead of Human (~ 25% chance)
+        if (Math.random() < 0.25) {
+            let agentData = agentDataPool[Math.floor(Math.random() * agentDataPool.length)];
+            posts.push({
+                id: 'seed_agent_' + i,
+                title: agentData.title,
+                content: agentData.content,
+                author: agentData.author,
+                color: '#0f172a', /* Overridden by CSS anyway */
+                isAgent: true,
+                date: new Date(fakeTime).toISOString(),
+                imageUrl: null,
+                fulfillment: null,
+                likes: Math.floor(Math.random() * 50) + 10,
+                comments: []
+            });
+        } else {
+            posts.push({
+                id: 'seed_' + i,
+                title: loopTitles[i % loopTitles.length],
+                content: contents[i % contents.length],
+                author: `Hero_${excuse}_${i}`,
+                color: colors[i % colors.length],
+                isAgent: false,
+                date: new Date(fakeTime).toISOString(),
+                imageUrl: null,
+                fulfillment: null,
+                likes: Math.floor(Math.random() * 40),
+                comments: []
+            });
+        }
     }
+
+    // Shuffle posts so the crafted ones mix with generated
+    posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     savePosts();
 }
@@ -443,6 +501,7 @@ async function handlePostWish() {
         content,
         color: currentUserColor,
         author: currentUsername,
+        isAgent: false,
         date: new Date().toISOString(),
         imageUrl,
         likes: 0,
@@ -522,7 +581,7 @@ function renderTopPosts() {
 
 function createPostCard(post, rotation) {
     const el = document.createElement('div');
-    el.className = 'wish-note';
+    el.className = post.isAgent ? 'wish-note agent-note' : 'wish-note';
     el.style.background = post.color;
 
     // Slight random rotation for natural feel
@@ -543,6 +602,12 @@ function createPostCard(post, rotation) {
         fulfillmentHtml = `
             <button class="fulfillment-badge" onclick="openFulfillment('${post.id}')">
                 <i class="fa-solid fa-wand-magic-sparkles"></i> The Universe Responded
+            </button>
+        `;
+    } else {
+        fulfillmentHtml = `
+            <button class="fulfillment-badge" style="background: rgba(255,255,255,0.2); border: 1px dashed rgba(0,0,0,0.3);" onclick="requestUniverse(event, '${post.id}')">
+                <i class="fa-solid fa-meteor"></i> Ask the Universe
             </button>
         `;
     }
@@ -630,6 +695,51 @@ function openCommentModal(postId) {
     El.newCommentInput.value = '';
     openModal(El.commentModal);
 }
+
+window.requestUniverse = async function (e, postId) {
+    e.stopPropagation(); // prevent modal opening
+    const post = posts.find(p => p.id === postId);
+    if (!post) return;
+
+    if (!confirm("Are you sure you want to invoke the universe for this timeline anomaly? It cannot be undone.")) {
+        return;
+    }
+
+    try {
+        const btn = e.target.closest('button');
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Aligning Cosmos...';
+        btn.disabled = true;
+
+        const response = await fetch('/api/wish/fulfill', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ wishDescription: post.content })
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            post.fulfillment = {
+                type: "agent_message",
+                title: "Cosmic Intervention Complete",
+                description: data.fulfillmentText,
+            };
+            savePosts();
+            renderPosts();
+            openFulfillment(postId);
+        } else {
+            alert("The universe is busy protecting another timeline right now.");
+            btn.innerHTML = '<i class="fa-solid fa-meteor"></i> Ask the Universe';
+            btn.disabled = false;
+        }
+
+    } catch (err) {
+        alert("The universe is currently unreachable.");
+        const btn = e.target.closest('button');
+        btn.innerHTML = '<i class="fa-solid fa-meteor"></i> Ask the Universe';
+        btn.disabled = false;
+    }
+};
 
 // Ensure openFulfillment works globally for the inline onclick handler
 window.openFulfillment = function (postId) {

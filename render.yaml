@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: educatedwish
+    env: node
+    buildCommand: npm install
+    startCommand: node src/server.js
+    disk:
+      name: uploads
+      mountPath: /opt/render/project/src/public/uploads
+      sizeGB: 1
