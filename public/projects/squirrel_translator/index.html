@@ -4,140 +4,182 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Squirrel Translator Engine v0.1</title>
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>Squirrel Translator Engine (Alpha v0.1)</title>
+    <!-- Use local font-awesome so there aren't loading issues-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- We can import the root styles to maintain the same branding -->
+    <link rel="stylesheet" href="/assets/css/styles.css">
+
     <style>
-        body {
-            font-family: 'Outfit', sans-serif;
+        body,
+        html {
+            height: 100vh;
             margin: 0;
-            padding: 0;
-            background: #111;
-            color: #fff;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
             display: flex;
-            justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            justify-content: center;
+            font-family: var(--primary-font);
         }
 
-        .container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.05);
-            padding: 3rem;
-            border-radius: 16px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+        .project-container {
             max-width: 600px;
+            width: 90%;
+            text-align: center;
+            padding: 4rem 2rem;
+            position: relative;
         }
 
-        h1 {
-            color: #4ade80;
-            margin-bottom: 0.5rem;
-        }
-
-        p {
-            color: #94a3b8;
+        .project-header {
+            color: var(--warning);
+            font-family: 'Courier New', Courier, monospace;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             margin-bottom: 2rem;
-            line-height: 1.6;
-        }
-
-        .upload-area {
-            border: 2px dashed rgba(74, 222, 128, 0.5);
-            padding: 3rem 2rem;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .upload-area:hover {
-            border-color: #4ade80;
-            background: rgba(74, 222, 128, 0.1);
-        }
-
-        .upload-area i {
-            font-size: 3rem;
-            color: #4ade80;
-            margin-bottom: 1rem;
-        }
-
-        .btn {
-            margin-top: 2rem;
-            background: #4ade80;
-            color: #111;
-            border: none;
-            padding: 1rem 2rem;
-            border-radius: 30px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: transform 0.2s;
-        }
-
-        .btn:hover {
-            transform: scale(1.05);
+            text-shadow: 0 0 10px rgba(234, 179, 8, 0.4);
         }
 
         .waveform {
-            display: none;
-            margin-top: 2rem;
-            height: 60px;
-            background: repeating-linear-gradient(90deg,
-                    rgba(74, 222, 128, 0.1),
-                    rgba(74, 222, 128, 0.1) 2px,
-                    rgba(74, 222, 128, 0.5) 2px,
-                    rgba(74, 222, 128, 0.5) 4px);
-            border-radius: 4px;
-            animation: moveWave 2s linear infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 5px;
+            height: 100px;
+            margin: 3rem 0;
         }
 
-        @keyframes moveWave {
+        .bar {
+            width: 8px;
+            height: 10px;
+            background: #4ade80;
+            border-radius: 4px;
+            animation: bounceWave 1s infinite alternate;
+            box-shadow: 0 0 8px #4ade80;
+        }
+
+        .bar:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .bar:nth-child(2) {
+            animation-delay: 0.4s;
+            height: 30px;
+        }
+
+        .bar:nth-child(3) {
+            animation-delay: 0.2s;
+            height: 70px;
+        }
+
+        .bar:nth-child(4) {
+            animation-delay: 0.6s;
+            height: 40px;
+        }
+
+        .bar:nth-child(5) {
+            animation-delay: 0.3s;
+            height: 90px;
+        }
+
+        .bar:nth-child(6) {
+            animation-delay: 0.7s;
+            height: 50px;
+        }
+
+        .bar:nth-child(7) {
+            animation-delay: 0.5s;
+            height: 80px;
+        }
+
+        .bar:nth-child(8) {
+            animation-delay: 0.8s;
+            height: 20px;
+        }
+
+        @keyframes bounceWave {
             0% {
-                background-position: 0 0;
+                transform: scaleY(0.5);
+                filter: opacity(0.5);
             }
 
             100% {
-                background-position: 40px 0;
+                transform: scaleY(1.2);
+                filter: opacity(1);
             }
+        }
+
+        .status-log {
+            font-family: 'Courier New', Courier, monospace;
+            color: #94a3b8;
+            font-size: 0.9rem;
+            border: 1px dashed #334155;
+            padding: 1rem;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.3);
+            text-align: left;
+            margin-bottom: 2rem;
+        }
+
+        .return-btn {
+            display: inline-block;
+            text-decoration: none;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1>Squirrel Translator Engine</h1>
-        <p>A functional alpha utilizing semantic audio analysis to map rodent vocalizations to human language models.
-            Help us fund compute or contribute training data below.</p>
 
-        <div class="upload-area" id="uploadArea">
-            <i class="fa-solid fa-microphone-lines"></i>
-            <h3>Drop Squirrel Audio Here</h3>
-            <p style="margin-bottom:0;">.mp3, .wav, .m4a accepted</p>
+    <div class="project-container glass-panel">
+        <h1 class="project-header">
+            <i class="fa-solid fa-satellite-dish"></i> Squirrel Translator Engine
+        </h1>
+        <p style="color: var(--text-secondary);">Alpha Model v0.1 • Neural Linguistic Mapping</p>
+
+        <div class="waveform">
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
         </div>
 
-        <div class="waveform" id="waveform"></div>
-
-        <div id="output" style="display:none; margin-top: 2rem; color: #facc15; font-size: 1.2rem; font-style: italic;">
-            "Analyzing vocalizations..."
+        <div class="status-log">
+            > [SYSTEM] Audio receptors active.<br>
+            > [SYSTEM] Awaiting environmental rodent acoustic input...<br>
+            > [SYSTEM] Filtering background noise...<br>
+            <span style="color: #4ade80; animation: flash 1.5s infinite;">_</span>
         </div>
 
-        <button class="btn">Donate to Compute Fund <i class="fa-solid fa-bolt"></i></button>
+        <a href="/" class="btn primary-btn return-btn">
+            <i class="fa-solid fa-arrow-left"></i> Return to The Sacred Timeline
+        </a>
     </div>
 
     <script>
-        const area = document.getElementById('uploadArea');
-        const wave = document.getElementById('waveform');
-        const output = document.getElementById('output');
+        // Simple interactivity for the mini-project out of the box
+        const log = document.querySelector('.status-log');
+        const messages = [
+            "Detecting chittering patterns...",
+            "Matching localized nut-hoarding algorithms...",
+            "Translate error: Expletive concerning local canine.",
+            "Recalibrating model...",
+            "Awaiting more audio..."
+        ];
 
-        area.addEventListener('click', () => {
-            area.style.display = 'none';
-            wave.style.display = 'block';
-            output.style.display = 'block';
+        let msgIndex = 0;
+        setInterval(() => {
+            log.innerHTML += `<br>> [AI_CORE] ${messages[msgIndex]}`;
+            msgIndex = (msgIndex + 1) % messages.length;
 
-            setTimeout(() => {
-                output.style.color = '#fff';
-                output.innerHTML = '<strong>Translation:</strong> "Did you bury the acorn near the large oak, or the slightly smaller oak?"';
-            }, 3000);
-        });
+            // Auto scroll or truncate logic if necessary
+            if (log.innerHTML.length > 500) {
+                log.innerHTML = '> [SYSTEM] Console flushed.<br><span style="color: #4ade80; animation: flash 1.5s infinite;">_</span>';
+            }
+        }, 3500);
     </script>
 </body>
 

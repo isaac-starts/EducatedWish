@@ -47,10 +47,6 @@ const El = {
     closeBtns: document.querySelectorAll('.close-modal'),
     navBtns: document.querySelectorAll('.nav-btn'),
     views: document.querySelectorAll('.view-section'),
-
-    // Logo elements
-    logoBtns: document.querySelectorAll('.logo-toggle-btn'),
-    logoVariants: document.querySelectorAll('.logo-variant'),
 };
 
 // Initialize
@@ -90,26 +86,6 @@ function setupEventListeners() {
             });
         });
     });
-
-    // Logo Toggles
-    El.logoBtns.forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            const target = e.target.getAttribute('data-target');
-
-            // Toggle buttons
-            El.logoBtns.forEach(b => b.classList.remove('active'));
-            e.target.classList.add('active');
-
-            // Toggle logos
-            El.logoVariants.forEach(l => {
-                l.classList.remove('active');
-                if (l.id === `logo-${target}`) {
-                    l.classList.add('active');
-                }
-            });
-        });
-    });
-
     // Color Picker
     El.colorPicker.addEventListener('click', (e) => {
         if (e.target.classList.contains('color-swatch')) {
@@ -232,7 +208,7 @@ function updateUserUI() {
 }
 
 // Data Management
-const SEED_VERSION = 'v3'; // Increment to force a seed refresh
+const SEED_VERSION = 'v4'; // Increment to force a seed refresh
 
 function loadPosts() {
     const currentSeedVersion = localStorage.getItem('educated_seed_version');
@@ -264,7 +240,7 @@ function seedPosts() {
     const seedData = [
         {
             title: "To speak to a squirrel",
-            content: "We should build a project that supports uploading video and audio of squirrels to train a model to understand what they are saying.",
+            content: "I want an app where I can record the squirrels in my backyard and finally understand what they are yelling at me.",
             author: "RodentWhisperer", color: "#C8E6C9",
             fulfillment: {
                 type: "mini_app",
