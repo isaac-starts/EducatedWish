@@ -1,0 +1,3 @@
+﻿setup:
+  project: overlord-shared-services
+  config: dev

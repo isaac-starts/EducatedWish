@@ -18,3 +18,5 @@ dist/
 
 # VSCode settings
 .vscode/
+
+.env
