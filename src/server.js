@@ -1,5 +1,6 @@
 const express = require('express');
 const path = require('path');
+const cors = require('cors');
 const routes = require('./routes/index');
 const upload = require('./utils/fileHandler');
 const store = require('./data/store');
@@ -12,6 +13,7 @@ const port = process.env.PORT || 3009;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 app.use(express.static(path.join(__dirname, '../public')));
 
 // File upload endpoint
