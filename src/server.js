@@ -25,6 +25,7 @@ app.post('/upload', upload.single('image'), (req, res) => {
     }
 });
 
+app.use('/api/ContentGenerationAPI', require('./routes/ContentGenerationAPI'));
 app.use(routes);
 
 app.listen(port, () => {
