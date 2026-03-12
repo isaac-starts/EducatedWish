@@ -43,6 +43,17 @@ function addPost(post) {
     savePosts(posts);
 }
 
+function deletePost(id) {
+    const posts = getPosts();
+    const initialLength = posts.length;
+    const filteredPosts = posts.filter(p => p.id !== id);
+    if (filteredPosts.length !== initialLength) {
+        savePosts(filteredPosts);
+        return true;
+    }
+    return false;
+}
+
 // Seed the DB if it's empty
 function seedDB() {
     const posts = getPosts();
@@ -255,5 +266,6 @@ module.exports = {
     getPost,
     updatePost,
     addPost,
+    deletePost,
     seedDB
 };

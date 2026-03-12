@@ -1,9 +1,36 @@
 const store = require('../data/store');
 const { OpenAI } = require('openai');
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY || 'dummy_key_for_local_testing',
-});
+async function getOpenAIInstance() {
+    let apiKey = process.env.OPENAI_API_KEY;
+
+    // Attempt to fetch from Papertrader Vault if local key is a placeholder or undefined
+    if (!apiKey || apiKey === 'dummy_key_for_local_testing') {
+        try {
+            const vaultUrl = process.env.PAPERTRADER_URL || 'http://127.0.0.1:8001';
+            const internalSecret = process.env.INTERNAL_API_SECRET || 'dev_shared_secret';
+
+            const response = await fetch(`${vaultUrl}/keys/internal/openai`, {
+                headers: {
+                    'Authorization': `Bearer ${internalSecret}`
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                apiKey = data.value;
+            }
+        } catch (err) {
+            console.error(`[UniverseEngine] Error connecting to Papertrader Vault:`, err.message);
+        }
+    }
+
+    return new OpenAI({
+        apiKey: apiKey || 'dummy_key_for_local_testing',
+    });
+}
+
+
 
 // An autonomous loop that checks for posts without fulfillments 
 // and randomly decides to intervene as the Universe.
@@ -29,8 +56,9 @@ async function scanAndFulfill() {
 
         let fulfillmentText = "The universe acknowledges your educated wish.";
 
-        if (process.env.OPENAI_API_KEY && process.env.OPENAI_API_KEY !== 'dummy_key_for_local_testing') {
-            const completion = await openai.chat.completions.create({
+        const openaiClient = await getOpenAIInstance();
+        if (openaiClient.apiKey !== 'dummy_key_for_local_testing') {
+            const completion = await openaiClient.chat.completions.create({
                 model: "gpt-4o-mini",
                 messages: [
                     { role: "system", content: "You are the autonomous AI engine of the universe. Respond to the user's wish with a mildly sarcastic but completely supportive confirmation that their wish has been fulfilled or is being worked on. Keep it under 2 sentences." },

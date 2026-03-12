@@ -5,6 +5,7 @@ const routes = require('./routes/index');
 const upload = require('./utils/fileHandler');
 const store = require('./data/store');
 const engine = require('./agent/universeEngine');
+const publishingEngine = require('./agent/publishingEngine');
 
 store.seedDB(); // Seed JSON DB if empty
 
@@ -28,9 +29,12 @@ app.post('/upload', upload.single('image'), (req, res) => {
 });
 
 app.use('/api/ContentGenerationAPI', require('./routes/ContentGenerationAPI'));
+app.use('/api/manage', require('./routes/manage'));
+app.use('/api/workflow', require('./routes/workflowQueue'));
 app.use(routes);
 
 app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
     engine.startEngine(); // Launch background autonomous universe engine
+    publishingEngine.start(); // Launch background publishing engine
 });

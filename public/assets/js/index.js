@@ -16,9 +16,14 @@ const El = {
     fileNameDisplay: document.getElementById('fileNameDisplay'),
     postWishBtn: document.getElementById('postWishBtn'),
     postsContainer: document.getElementById('postsContainer'),
+    
+    // Tuner
+    timelineAlignment: document.getElementById('timelineAlignment'),
+    tunerDisplay: document.getElementById('tunerDisplay'),
     topPostsContainer: document.getElementById('topPostsContainer'),
     searchInput: document.getElementById('searchInput'),
     sortSelect: document.getElementById('sortSelect'),
+    multiverseToggle: document.getElementById('multiverseToggle'),
 
     // User Elements
     userBadge: document.getElementById('userBadge'),
@@ -109,6 +114,20 @@ function setupEventListeners() {
         }
     });
 
+    // Timeline Tuner
+    El.timelineAlignment.addEventListener('input', (e) => {
+        El.tunerDisplay.textContent = `${e.target.value}Hz`;
+        
+        // Give visual feedback when aligned perfectly
+        if (e.target.value === "42") {
+            El.tunerDisplay.style.color = "var(--primary-color)";
+            El.tunerDisplay.style.fontWeight = "bold";
+        } else {
+            El.tunerDisplay.style.color = "";
+            El.tunerDisplay.style.fontWeight = "";
+        }
+    });
+
     // Post Wish
     El.postWishBtn.addEventListener('click', handlePostWish);
 
@@ -118,6 +137,14 @@ function setupEventListeners() {
         currentSort = e.target.value;
         renderPosts();
     });
+    
+    // Multiverse Toggle
+    if (El.multiverseToggle) {
+        El.multiverseToggle.addEventListener('change', () => {
+            renderPosts();
+            renderTopPosts(); 
+        });
+    }
 
     // Modals
     El.userBadge.addEventListener('click', () => openModal(El.usernameModal));
@@ -235,8 +262,15 @@ async function savePost(post) {
 async function handlePostWish() {
     const title = El.wishTitle.value.trim();
     const content = El.wishContent.value.trim();
+    const frequency = parseInt(El.timelineAlignment.value, 10);
+    
     if (!title || !content) {
         alert("Please provide both a title and describe your wish.");
+        return;
+    }
+    
+    if (frequency !== 42) {
+        alert("Biological verify failed: Your cosmic frequency must be aligned exactly to 42Hz to pin a wish.");
         return;
     }
 
@@ -269,6 +303,7 @@ async function handlePostWish() {
         color: currentUserColor,
         author: currentUsername,
         isAgent: false,
+        timelineAlignment: frequency,
         date: new Date().toISOString(),
         imageUrl,
         likes: 0,
@@ -295,6 +330,10 @@ async function handlePostWish() {
     El.wishContent.value = '';
     El.wishFile.value = '';
     El.fileNameDisplay.textContent = '';
+    El.timelineAlignment.value = 0;
+    El.tunerDisplay.textContent = '0Hz';
+    El.tunerDisplay.style.color = "";
+    El.tunerDisplay.style.fontWeight = "";
 
     El.postWishBtn.disabled = false;
     renderPosts();
@@ -304,6 +343,13 @@ async function handlePostWish() {
 // Rendering
 function renderPosts() {
     let filtered = [...posts];
+
+    // Filter by Toggle Status
+    const includeAgents = El.multiverseToggle ? El.multiverseToggle.checked : true;
+    
+    if (!includeAgents) {
+        filtered = filtered.filter(p => !p.isAgent);
+    }
 
     // Search
     const term = El.searchInput.value.toLowerCase().trim();
@@ -333,7 +379,23 @@ function renderPosts() {
         return;
     }
 
+    // Enforce 1:3 visual ratio (max 1 agent per 3 humans)
+    let humanCountThisGroup = 0;
+    
     filtered.forEach((post, index) => {
+        // If agent posts are "on", we still limit their dominance
+        if (includeAgents && post.isAgent) {
+            if (humanCountThisGroup < 3) {
+                // Not enough humans have been shown yet to allow another agent
+                return; // Skip this agent post for now
+            } else {
+                // Allowed to show an agent, reset the human counter
+                humanCountThisGroup = 0;
+            }
+        } else if (!post.isAgent) {
+            humanCountThisGroup++;
+        }
+
         const rotation = (index % 5) - 2; // -2 to 2 degrees
         const card = createPostCard(post, rotation);
         El.postsContainer.appendChild(card);

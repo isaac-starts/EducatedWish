@@ -1,10 +1,39 @@
 require('dotenv').config();
 const { OpenAI } = require('openai');
 
-// Initialize with dummy key if missing so server doesn't crash locally
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY || 'dummy_key_for_local_testing',
-});
+async function getOpenAIInstance() {
+    let apiKey = process.env.OPENAI_API_KEY;
+
+    // Attempt to fetch from Papertrader Vault if local key is a placeholder or undefined
+    if (!apiKey || apiKey === 'dummy_key_for_local_testing') {
+        try {
+            const vaultUrl = process.env.PAPERTRADER_URL || 'http://127.0.0.1:8001';
+            const internalSecret = process.env.INTERNAL_API_SECRET || 'dev_shared_secret';
+
+            const response = await fetch(`${vaultUrl}/keys/internal/openai`, {
+                headers: {
+                    'Authorization': `Bearer ${internalSecret}`
+                }
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                apiKey = data.value;
+                console.log("[EducatedWish] Successfully retrieved OpenAI key from Papertrader Vault.");
+            } else {
+                console.warn(`[EducatedWish] Failed to fetch key from vault: ${response.status} ${response.statusText}`);
+            }
+        } catch (err) {
+            console.error(`[EducatedWish] Error connecting to Papertrader Vault:`, err.message);
+        }
+    }
+
+    return new OpenAI({
+        apiKey: apiKey || 'dummy_key_for_local_testing',
+    });
+}
+
+
 
 exports.fulfillWish = async (req, res) => {
     try {
@@ -16,25 +45,27 @@ exports.fulfillWish = async (req, res) => {
 
         let fulfillmentText = "";
 
-        // If we only have the dummy key, return a mock response
-        if (process.env.OPENAI_API_KEY === undefined || process.env.OPENAI_API_KEY === 'dummy_key_for_local_testing') {
-            fulfillmentText = "The universe acknowledges your educated wish. (Mock API response - OpenAI key not configured locally).";
-        } else {
-            const completion = await openai.chat.completions.create({
-                model: "gpt-4o-mini", // Fast, capable model
-                messages: [
-                    { role: "system", content: "You are the universe, mysteriously and magically fulfilling the user's wish. Provide a slightly whimsical, supportive message explaining how their wish is being manifested. Keep it under 3 sentences." },
-                    { role: "user", content: `My wish is: ${wishDescription}` }
-                ]
+        if (!process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY === 'dummy_key_for_local_testing') {
+            const openaiClient = await getOpenAIInstance();
+            if (openaiClient.apiKey === 'dummy_key_for_local_testing') {
+                fulfillmentText = "The universe acknowledges your educated wish. (Mock API response - OpenAI key not configured locally or in vault).";
+            } else {
+                const completion = await openaiClient.chat.completions.create({
+                    model: "gpt-4o-mini", // Fast, capable model
+                    messages: [
+                        { role: "system", content: "You are the universe, mysteriously and magically fulfilling the user's wish. Provide a slightly whimsical, supportive message explaining how their wish is being manifested. Keep it under 3 sentences." },
+                        { role: "user", content: `My wish is: ${wishDescription}` }
+                    ]
+                });
+                fulfillmentText = completion.choices[0].message.content;
+            }
+
+            res.json({
+                success: true,
+                fulfillmentText
             });
-            fulfillmentText = completion.choices[0].message.content;
+
         }
-
-        res.json({
-            success: true,
-            fulfillmentText
-        });
-
     } catch (error) {
         console.error("OpenAI Error:", error);
         res.status(500).json({ error: "The universe is currently realigning... please try again later." });
@@ -96,7 +127,9 @@ exports.generateContent = async (req, res) => {
 };
 
 async function runLLMGeneration(task_type, parameters) {
-    if (process.env.OPENAI_API_KEY === undefined || process.env.OPENAI_API_KEY === 'dummy_key_for_local_testing') {
+    const openaiClient = await getOpenAIInstance();
+
+    if (openaiClient.apiKey === 'dummy_key_for_local_testing') {
         return `Mock generated content for ${task_type}. (Local testing without OpenAI Key). Topic: ${parameters.topic || 'Unknown'}`;
     }
 
@@ -111,7 +144,7 @@ async function runLLMGeneration(task_type, parameters) {
     if (task_type === "ad_copy") systemPrompt = "You are a master of short, punchy ad copywriting.";
     if (task_type === "speech") systemPrompt = "You are an experienced speechwriter for political campaigns.";
 
-    const completion = await openai.chat.completions.create({
+    const completion = await openaiClient.chat.completions.create({
         model: "gpt-4o",
         messages: [
             { role: "system", content: systemPrompt },

@@ -78,6 +78,17 @@
                                 <div class="color-swatch" data-color="#BBDEFB" style="background: #BBDEFB;"></div>
                                 <div class="color-swatch" data-color="#FFECB3" style="background: #FFECB3;"></div>
                             </div>
+                            
+                            <div class="timeline-tuner">
+                                <div class="tuner-header">
+                                    <span>Cosmic Frequency</span>
+                                    <span class="tuner-target">Align to 42Hz</span>
+                                </div>
+                                <input type="range" id="timelineAlignment" class="tuner-slider" min="0" max="100" value="0">
+                                <div class="tuner-header" style="justify-content: center; margin-top: 0.2rem;">
+                                    <span class="tuner-value" id="tunerDisplay">0Hz</span>
+                                </div>
+                            </div>
 
                             <div class="file-action">
                                 <input type="file" id="wishFile" accept="image/*" class="hidden-input">
@@ -122,6 +133,10 @@
                     <div class="search-box">
                         <i class="fa-solid fa-magnifying-glass"></i>
                         <input type="text" id="searchInput" placeholder="Search wishes...">
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.5rem; background: rgba(255,255,255,0.1); padding: 0.4rem 0.8rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2);">
+                        <input type="checkbox" id="multiverseToggle" checked style="accent-color: var(--accent-light); cursor: pointer; width: 16px; height: 16px;">
+                        <label for="multiverseToggle" style="font-size: 0.9rem; cursor: pointer;">Multiverse Activity</label>
                     </div>
                     <select id="sortSelect" class="glass-select">
                         <option value="newest">Sort by: Most Recent Event</option>

@@ -11,8 +11,10 @@ router.post('/api/wish/fulfill', aiController.fulfillWish);
 // Educated Wish Central API Routes
 router.post('/api/v1/generate', requireInternalAuth, aiController.generateContent);
 
+const { boardAuthMiddleware } = require('../utils/boardAuth');
+
 router.get('/api/posts', postController.getPosts);
-router.post('/api/posts', postController.createPost);
+router.post('/api/posts', boardAuthMiddleware, postController.createPost);
 router.post('/api/posts/update', postController.updatePost);
 
 module.exports = router;
