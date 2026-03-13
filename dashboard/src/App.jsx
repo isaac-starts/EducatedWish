@@ -26,8 +26,14 @@ function App() {
   const [generatedIdeas, setGeneratedIdeas] = useState([]);
   const [isFetchingIdeas, setIsFetchingIdeas] = useState(false);
 
+  // Multi-Project States
+  const [projects, setProjects] = useState([]);
+  const [currentProject, setCurrentProject] = useState(null);
+  const [isAddingProject, setIsAddingProject] = useState(false);
+  const [newProjectName, setNewProjectName] = useState("");
+
   useEffect(() => {
-    fetchPosts();
+    fetchProjects();
     fetchWorkflows();
     
     // Polling setup for Pending Workflows
@@ -38,10 +44,32 @@ function App() {
     return () => clearInterval(interval);
   }, []);
 
+  // When the project changes, reload posts
+  useEffect(() => {
+    if (currentProject) {
+      fetchPosts();
+    }
+  }, [currentProject]);
+
+  const fetchProjects = async () => {
+    try {
+      const res = await axios.get(`${API_BASE}/projects`);
+      if (res.data.status === 'success') {
+        setProjects(res.data.data);
+        if (res.data.data.length > 0 && !currentProject) {
+          setCurrentProject(res.data.data[0]); // Default to first project
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching projects:", err);
+    }
+  };
+
   const fetchPosts = async () => {
+    if (!currentProject) return;
     try {
       setLoading(true);
-      const res = await axios.get(`${API_BASE}/content`);
+      const res = await axios.get(`${API_BASE}/content?projectId=${currentProject.id}`);
       if (res.data.status === 'success') {
         const sorted = res.data.data.sort((a, b) => new Date(b.date) - new Date(a.date));
         const mapped = sorted.map(p => ({ ...p, status: p.status || 'draft' }));
@@ -63,6 +91,22 @@ function App() {
       console.error("Error updating status:", err);
       // Revert on fail
       fetchPosts(); 
+    }
+  };
+
+  const createProject = async () => {
+    if (!newProjectName.trim()) return;
+    try {
+      const res = await axios.post(`${API_BASE}/projects`, { name: newProjectName });
+      if (res.data.status === 'success') {
+        const newProj = res.data.data;
+        setProjects([...projects, newProj]);
+        setCurrentProject(newProj);
+        setNewProjectName('');
+        setIsAddingProject(false);
+      }
+    } catch (err) {
+      console.error("Error creating project:", err);
     }
   };
 
@@ -126,7 +170,11 @@ function App() {
   const startWorkflow = async () => {
     if (!newPrompt) return;
     try {
-      await axios.post(`${WORKFLOW_API}/start`, { prompt: newPrompt, author: 'HumanDirector' });
+      await axios.post(`${WORKFLOW_API}/start`, { 
+        prompt: newPrompt, 
+        author: 'HumanDirector',
+        projectId: currentProject?.id || 'proj_default'
+      });
       setNewPrompt('');
       setIsPrompting(false);
       setGeneratedIdeas([]);
@@ -178,13 +226,38 @@ function App() {
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans">
       <header className="bg-slate-950 border-b border-slate-800 px-6 py-4 flex justify-between items-center sticky top-0 z-10 shadow-lg shadow-black/20">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-1">
           <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center shadow-lg shadow-blue-500/20">
             <Play size={18} className="text-white ml-0.5" fill="currentColor" />
           </div>
           <div>
             <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">Educated Wish</h1>
             <p className="text-xs text-slate-400 font-medium tracking-wide">Content Generation Dashboard</p>
+          </div>
+          
+          <div className="h-8 w-px bg-slate-800 mx-4"></div>
+          
+          {/* Project Selector */}
+          <div className="flex items-center gap-2">
+            <select 
+              value={currentProject?.id || ''} 
+              onChange={(e) => {
+                const proj = projects.find(p => p.id === e.target.value);
+                setCurrentProject(proj);
+              }}
+              className="bg-slate-900 border border-slate-700 text-slate-200 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block p-2 focus:outline-none shadow-sm"
+            >
+              {projects.map(p => (
+                <option key={p.id} value={p.id}>{p.name}</option>
+              ))}
+            </select>
+            <button 
+              onClick={() => setIsAddingProject(true)}
+              className="bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg p-2 transition shadow-sm border border-slate-700"
+              title="Add New Project"
+            >
+              +
+            </button>
           </div>
         </div>
         
@@ -424,6 +497,43 @@ function App() {
                     ))}
                 </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Add Project Modal */}
+      {isAddingProject && (
+        <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50">
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl p-6 w-full max-w-sm shadow-2xl shadow-black/50 overflow-hidden relative">
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-400 to-blue-600"></div>
+            <h2 className="text-xl font-bold mb-4 text-white">Create New Project</h2>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-slate-400 mb-1">Project Name</label>
+                <input 
+                  type="text"
+                  value={newProjectName}
+                  onChange={e => setNewProjectName(e.target.value)}
+                  placeholder="e.g. Directory Project"
+                  className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+                  onKeyDown={(e) => { if (e.key === 'Enter') createProject(); }}
+                />
+              </div>
+            </div>
+
+            <div className="mt-8 flex justify-end gap-3">
+              <button 
+                onClick={() => { setIsAddingProject(false); setNewProjectName(''); }}
+                className="px-4 py-2 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors font-medium">
+                Cancel
+              </button>
+              <button 
+                onClick={createProject}
+                disabled={!newProjectName.trim()}
+                className="px-6 py-2 bg-blue-600 disabled:opacity-50 hover:bg-blue-500 text-white rounded-lg transition-colors font-semibold flex items-center gap-2 shadow-lg shadow-blue-500/20">
+                Create Project
+              </button>
+            </div>
           </div>
         </div>
       )}

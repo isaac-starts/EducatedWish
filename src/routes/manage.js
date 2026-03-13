@@ -7,6 +7,12 @@ router.get('/content', (req, res) => {
     try {
         let posts = store.getPosts();
         
+        // Filter by projectId (default to proj_default if not set to support older records)
+        const projectId = req.query.projectId;
+        if (projectId) {
+            posts = posts.filter(p => (p.projectId || 'proj_default') === projectId);
+        }
+
         // Optional filter by status
         if (req.query.status) {
             posts = posts.filter(p => p.status === req.query.status);
@@ -38,6 +44,7 @@ router.post('/content', (req, res) => {
     try {
         const newPost = {
             id: 'post_' + Date.now(),
+            projectId: req.body.projectId || 'proj_default',
             title: req.body.title || 'Untitled',
             content: req.body.content || '',
             author: req.body.author || 'Admin',
@@ -87,6 +94,34 @@ router.delete('/content/:id', (req, res) => {
     } catch (err) {
         console.error("[ManageAPI] Error deleting content:", err.message);
         res.status(500).json({ error: "Failed to delete content" });
+    }
+});
+
+// --- PROJECT ENDPOINTS ---
+
+router.get('/projects', (req, res) => {
+    try {
+        const projects = store.getProjects();
+        res.status(200).json({ status: "success", data: projects });
+    } catch (err) {
+        console.error("[ManageAPI] Error fetching projects:", err.message);
+        res.status(500).json({ error: "Failed to fetch projects" });
+    }
+});
+
+router.post('/projects', (req, res) => {
+    try {
+        const newProject = {
+            id: 'proj_' + Date.now(),
+            name: req.body.name || 'Untitled Project',
+            icon: req.body.icon || 'folder',
+            createdAt: new Date().toISOString()
+        };
+        store.addProject(newProject);
+        res.status(201).json({ status: "success", data: newProject });
+    } catch (err) {
+        console.error("[ManageAPI] Error creating project:", err.message);
+        res.status(500).json({ error: "Failed to create project" });
     }
 });
 

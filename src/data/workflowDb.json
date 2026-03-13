@@ -1,1 +1,13 @@
-[]
+[
+  {
+    "prompt": "A dynamic, high-quality video showing a professional in Edmonton discussing Edmonton chiro. Smooth cinematic lighting. (1)",
+    "author": "HumanDirector",
+    "status": "POSTED",
+    "id": "wf_1773373718069_942",
+    "createdAt": "2026-03-13T03:48:38.069Z",
+    "updatedAt": "2026-03-13T03:48:48.459Z",
+    "videoUrl": "https://example.com/mock_generated_video.mp4",
+    "approvedAt": "2026-03-13T03:48:46.445Z",
+    "postedAt": "2026-03-13T03:48:48.458Z"
+  }
+]

@@ -2,10 +2,18 @@ const fs = require('fs');
 const path = require('path');
 
 const DB_PATH = path.join(__dirname, 'db.json');
+const PROJECTS_PATH = path.join(__dirname, 'projects.json');
 
 // Initialize DB file if not exists
 if (!fs.existsSync(DB_PATH)) {
     fs.writeFileSync(DB_PATH, JSON.stringify([]));
+}
+
+// Initialize projects file if not exists
+if (!fs.existsSync(PROJECTS_PATH)) {
+    fs.writeFileSync(PROJECTS_PATH, JSON.stringify([
+        { id: 'proj_default', name: 'Educated Wish Default', icon: 'zap' }
+    ], null, 2));
 }
 
 function getPosts() {
@@ -52,6 +60,32 @@ function deletePost(id) {
         return true;
     }
     return false;
+}
+
+// --- PROJECT METHODS ---
+
+function getProjects() {
+    try {
+        const data = fs.readFileSync(PROJECTS_PATH, 'utf-8');
+        return JSON.parse(data);
+    } catch (e) {
+        return [{ id: 'proj_default', name: 'Educated Wish Default', icon: 'zap' }];
+    }
+}
+
+function saveProjects(projects) {
+    fs.writeFileSync(PROJECTS_PATH, JSON.stringify(projects, null, 2));
+}
+
+function getProject(id) {
+    const projects = getProjects();
+    return projects.find(p => p.id === id);
+}
+
+function addProject(project) {
+    const projects = getProjects();
+    projects.push(project);
+    saveProjects(projects);
 }
 
 // Seed the DB if it's empty
@@ -267,5 +301,9 @@ module.exports = {
     updatePost,
     addPost,
     deletePost,
+    getProjects,
+    saveProjects,
+    getProject,
+    addProject,
     seedDB
 };
