@@ -6,6 +6,7 @@ const upload = require('./utils/fileHandler');
 const store = require('./data/store');
 const engine = require('./agent/universeEngine');
 const publishingEngine = require('./agent/publishingEngine');
+const keywordExtractor = require('./agent/keyword_extractor');
 
 store.seedDB(); // Seed JSON DB if empty
 
@@ -37,4 +38,8 @@ app.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`);
     engine.startEngine(); // Launch background autonomous universe engine
     publishingEngine.start(); // Launch background publishing engine
+    
+    // Launch background keyword extractor (runs once on startup, then every 24 hours)
+    keywordExtractor.runExtraction();
+    setInterval(() => keywordExtractor.runExtraction(), 24 * 60 * 60 * 1000);
 });
